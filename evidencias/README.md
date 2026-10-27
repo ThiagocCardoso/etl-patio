@@ -1,4 +1,4 @@
-# Evidências da Fase 3: ambiente e carga da staging
+# Evidências da Etapa 6: ambiente e carga da staging
 
 Prints da execução do pipeline `01_staging_atendimento`, que lê a planilha simulada de atendimentos e grava na tabela `stg_atendimento` do banco `dw_patio`.
 
