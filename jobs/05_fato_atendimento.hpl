@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pipeline>
+  <info>
+    <capture_transform_performance>N</capture_transform_performance>
+    <transform_performance_capturing_delay>1000</transform_performance_capturing_delay>
+    <transform_performance_capturing_size_limit>100</transform_performance_capturing_size_limit>
+    <pipeline_type>Normal</pipeline_type>
+    <pipeline_status>-1</pipeline_status>
+    <parameters/>
+    <name>New pipeline</name>
+    <name_sync_with_filename>Y</name_sync_with_filename>
+    <created_user>-</created_user>
+    <modified_user>-</modified_user>
+    <created_date>2026/10/30 01:30:33.871</created_date>
+    <modified_date>2026/10/30 01:30:33.871</modified_date>
+  </info>
+  <transform>
+    <type>TableInput</type>
+    <name>Fato: ler stg_limpo</name>
+    <sql>   SELECT id_registro AS id_atendimento,
+          placa, tipo_servico, nome_status, nome_responsavel,
+          dt_hora_entrada, dt_hora_inicio_manutencao, dt_hora_conclusao, dt_hora_liberacao,
+          km_entrada,
+          TO_CHAR(dt_hora_entrada, 'YYYYMMDD')::int AS sk_data_entrada,
+          EXTRACT(HOUR FROM dt_hora_entrada)::int AS sk_hora_entrada,
+          TO_CHAR(dt_hora_conclusao, 'YYYYMMDD')::int AS sk_data_conclusao,
+          TO_CHAR(dt_hora_liberacao, 'YYYYMMDD')::int AS sk_data_liberacao,
+          ROUND(EXTRACT(EPOCH FROM (dt_hora_liberacao - dt_hora_entrada)) / 60)::int AS tempo_permanencia_min,
+          ROUND(EXTRACT(EPOCH FROM (dt_hora_conclusao - dt_hora_entrada)) / 60)::int AS tempo_ate_conclusao_min,
+          ROUND(EXTRACT(EPOCH FROM (dt_hora_liberacao - dt_hora_conclusao)) / 60)::int AS tempo_aguardando_liberacao_min,
+          ROUND(EXTRACT(EPOCH FROM (dt_hora_inicio_manutencao - dt_hora_entrada)) / 60)::int AS tempo_espera_min,
+          ROUND(EXTRACT(EPOCH FROM (dt_hora_conclusao - dt_hora_inicio_manutencao)) / 60)::int AS tempo_execucao_min,
+          1 AS qtd_atendimento
+   FROM stg_limpo</sql>
+    <limit>0</limit>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <connection>dw_patio</connection>
+    <lookup/>
+    <sql_from_file/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+    <GUI>
+      <xloc>192</xloc>
+      <yloc>160</yloc>
+    </GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+  </transform>
+  <transform>
+    <type>DBLookup</type>
+    <name>Chave: veículo</name>
+    <connection>dw_patio</connection>
+    <cache>N</cache>
+    <cache_size>0</cache_size>
+    <cache_load_all>N</cache_load_all>
+    <lookup>
+      <schema/>
+      <table>dimveiculo</table>
+      <key>
+        <name>placa</name>
+        <name2/>
+        <condition>=</condition>
+        <field>placa</field>
+      </key>
+      <value>
+        <name>sk_veiculo</name>
+        <rename/>
+        <default/>
+        <type>Integer</type>
+        <trim_type>none</trim_type>
+      </value>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+    </lookup>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+    <GUI>
+      <xloc>352</xloc>
+      <yloc>160</yloc>
+    </GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+  </transform>
+  <transform>
+    <type>DBLookup</type>
+    <name>Chave: serviço</name>
+    <connection>dw_patio</connection>
+    <cache>N</cache>
+    <cache_size>0</cache_size>
+    <cache_load_all>N</cache_load_all>
+    <lookup>
+      <schema/>
+      <table>dimservico</table>
+      <key>
+        <name>tipo_servico</name>
+        <name2/>
+        <condition>=</condition>
+        <field>tipo_servico</field>
+      </key>
+      <value>
+        <name>sk_servico</name>
+        <rename/>
+        <default/>
+        <type>Integer</type>
+        <trim_type>none</trim_type>
+      </value>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+    </lookup>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+    <GUI>
+      <xloc>496</xloc>
+      <yloc>160</yloc>
+    </GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+  </transform>
+  <transform>
+    <type>DBLookup</type>
+    <name>Chave: status</name>
+    <connection>dw_patio</connection>
+    <cache>N</cache>
+    <cache_size>0</cache_size>
+    <cache_load_all>N</cache_load_all>
+    <lookup>
+      <schema/>
+      <table>dimstatus</table>
+      <key>
+        <name>nome_status</name>
+        <name2/>
+        <condition>=</condition>
+        <field>nome_status</field>
+      </key>
+      <value>
+        <name>sk_status</name>
+        <rename/>
+        <default/>
+        <type>Integer</type>
+        <trim_type>none</trim_type>
+      </value>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+    </lookup>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+    <GUI>
+      <xloc>640</xloc>
+      <yloc>160</yloc>
+    </GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+  </transform>
+  <transform>
+    <type>DBLookup</type>
+    <name>Chave: responsável</name>
+    <connection>dw_patio</connection>
+    <cache>N</cache>
+    <cache_size>0</cache_size>
+    <cache_load_all>N</cache_load_all>
+    <lookup>
+      <schema/>
+      <table>dimresponsavel</table>
+      <key>
+        <name>nome_responsavel</name>
+        <name2/>
+        <condition>=</condition>
+        <field>nome_responsavel</field>
+      </key>
+      <value>
+        <name>sk_responsavel</name>
+        <rename/>
+        <default/>
+        <type>Integer</type>
+        <trim_type>none</trim_type>
+      </value>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+    </lookup>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+    <GUI>
+      <xloc>800</xloc>
+      <yloc>160</yloc>
+    </GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+  </transform>
+  <transform>
+    <type>InsertUpdate</type>
+    <name>Gravar fatoatendimento</name>
+    <lookup>
+      <key>
+        <name>id_atendimento</name>
+        <field>id_atendimento</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>id_atendimento</name>
+        <rename>id_atendimento</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>dt_hora_entrada</name>
+        <rename>dt_hora_entrada</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>dt_hora_inicio_manutencao</name>
+        <rename>dt_hora_inicio_manutencao</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>dt_hora_conclusao</name>
+        <rename>dt_hora_conclusao</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>dt_hora_liberacao</name>
+        <rename>dt_hora_liberacao</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>km_entrada</name>
+        <rename>km_entrada</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sk_data_entrada</name>
+        <rename>sk_data_entrada</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sk_hora_entrada</name>
+        <rename>sk_hora_entrada</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sk_data_conclusao</name>
+        <rename>sk_data_conclusao</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sk_data_liberacao</name>
+        <rename>sk_data_liberacao</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tempo_permanencia_min</name>
+        <rename>tempo_permanencia_min</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tempo_ate_conclusao_min</name>
+        <rename>tempo_ate_conclusao_min</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tempo_aguardando_liberacao_min</name>
+        <rename>tempo_aguardando_liberacao_min</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tempo_espera_min</name>
+        <rename>tempo_espera_min</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tempo_execucao_min</name>
+        <rename>tempo_execucao_min</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>qtd_atendimento</name>
+        <rename>qtd_atendimento</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sk_veiculo</name>
+        <rename>sk_veiculo</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sk_servico</name>
+        <rename>sk_servico</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sk_status</name>
+        <rename>sk_status</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sk_responsavel</name>
+        <rename>sk_responsavel</rename>
+        <update>Y</update>
+      </value>
+      <schema/>
+      <table>fatoatendimento</table>
+    </lookup>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <connection>dw_patio</connection>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+    <GUI>
+      <xloc>976</xloc>
+      <yloc>160</yloc>
+    </GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+  </transform>
+  <order>
+    <hop>
+      <from>Fato: ler stg_limpo</from>
+      <to>Chave: veículo</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Chave: veículo</from>
+      <to>Chave: serviço</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Chave: serviço</from>
+      <to>Chave: status</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Chave: status</from>
+      <to>Chave: responsável</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Chave: responsável</from>
+      <to>Gravar fatoatendimento</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <notepads/>
+  <attributes/>
+  <transform_error_handling/>
+</pipeline>
