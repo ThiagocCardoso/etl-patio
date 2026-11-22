@@ -204,6 +204,17 @@ WHERE tipo_servico NOT IN (SELECT tipo_servico FROM dimservico)</sql>
         <decimal>.</decimal>
         <group>,</group>
       </field>
+      <field>
+        <name>categoria_servico</name>
+        <length>10</length>
+        <type>String</type>
+        <format/>
+        <trim_type>none</trim_type>
+        <precision>-1</precision>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+      </field>
     </fields>
     <distribute>Y</distribute>
     <copies>1</copies>
@@ -236,6 +247,12 @@ WHERE tipo_servico NOT IN (SELECT tipo_servico FROM dimservico)</sql>
         <default/>
         <type>String</type>
       </value>
+      <value>
+        <name>categoria_servico</name>
+        <rename>categoria_encontrada</rename>
+        <default/>
+        <type>String</type>
+      </value>
     </lookup>
     <distribute>Y</distribute>
     <copies>1</copies>
@@ -255,7 +272,7 @@ WHERE tipo_servico NOT IN (SELECT tipo_servico FROM dimservico)</sql>
     <formulas>
       <formula>
         <field_name>categoria_servico</field_name>
-        <formula>   IF(ISBLANK([padrao_encontrado]),"A classificar","")</formula>
+        <formula>IF(ISBLANK([padrao_encontrado]),"A classificar",[categoria_encontrada])</formula>
         <value_type>2</value_type>
         <value_length>-1</value_length>
         <value_precision>-1</value_precision>
